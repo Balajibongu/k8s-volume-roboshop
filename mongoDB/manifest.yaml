@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: roboshop
+  labels:
+    name: roboshop
+    env: dev
+    running: mongodb
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      name: roboshop
+      env: dev
+      running: mongodb
+
+  template:
+    metadata:
+      labels:
+        name: roboshop
+        env: dev
+        running: mongodb
+
+    spec:
+      containers:
+        - name: mongodb
+          image: balaji1729/mongodb:v1
+          imagePullPolicy: Always
+
+          ports:
+            - name: mongodb
+              containerPort: 27017
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+          readinessProbe:
+            tcpSocket:
+              port: mongodb
+            failureThreshold: 1
+            periodSeconds: 20
+          livenessProbe:
+            tcpSocket:
+              port: mongodb
+            failureThreshold: 1
+            periodSeconds: 30
+          volumeMounts:
+          - mountPath: /data/db
+            name: mongodb-volume 
+          nodeSelector:
+            topology.kubernetes.io/zone: us-east-1c
+  volumeClaimTemplates:
+      - name: mongodb-volume
+        spec:
+          accessModes: [ "ReadWriteOnce" ]
+          storageClassName: "ebs-mongodb"
+          resources:
+            requests:
+              storage: 1Gi
+---
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: mongodb
+  namespace: roboshop
+
+spec:
+  type: ClusterIP
+
+  selector:
+    name: roboshop
+    env: dev
+    running: mongodb
+
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: mongodb-headless
+  namespace: roboshop
+
+spec:
+  clusterIP: None
+
+  selector:
+    name: roboshop
+    env: dev
+    running: mongodb
+
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017

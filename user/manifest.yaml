@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-configmap
+  namespace: roboshop
+data:
+  MONGO: "true"
+  REDIS_URL: "redis://redis:6379"
+  MONGO_URL: "mongodb://mongodb:27017/users"
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: user
+  namespace: roboshop
+  labels:
+    name: roboshop
+    env: dev
+    running: user
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      name: roboshop
+      env: dev
+      running: user
+  template:
+    metadata:
+      labels:
+        name: roboshop
+        env: dev
+        running: user
+    spec:
+      containers:
+      - name: user
+        image: balaji1729/user:v1
+        imagePullPolicy: Always
+        ports:
+        - name: liveness-port
+          containerPort: 8080
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 300m
+            memory: 256Mi
+        envFrom:
+        - configMapRef:
+            name: user
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: liveness-port
+          failureThreshold: 1
+          periodSeconds: 20
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: liveness-port
+          failureThreshold: 1
+          periodSeconds: 30 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+  namespace: roboshop
+spec:
+  type: ClusterIP
+  selector:
+      name: roboshop
+      env: dev
+      running: user
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
