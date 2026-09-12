@@ -62,8 +62,8 @@ spec:
           - name: mysql-config
             mountPath: /etc/mysql/conf.d/my.cnf
             subPath: my.cnf
-  nodeSelector:
-            topology.kubernetes.io/zone: us-east-1c
+      nodeSelector:
+                topology.kubernetes.io/zone: us-east-1c
   volumeClaimTemplates:
       - metadata:
           name: mysql-config
