@@ -10,6 +10,7 @@ metadata:
     tier: db
 spec:
   replicas: 1
+  serviceName: "redis-headless"
   selector:
     # these labels are used to select pods
     matchLabels:

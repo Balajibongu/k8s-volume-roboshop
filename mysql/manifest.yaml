@@ -19,6 +19,7 @@ metadata:
     component: mysql
     tier: db
 spec:
+  serviceName: "mysql-headless"
   replicas: 1
   selector:
     # these labels are used to select pods
