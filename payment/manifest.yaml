@@ -1,42 +1,50 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: catalogue
+  name: payment-configmap
   namespace: roboshop
 data:
-  MONGO: "true"
-  MONGO_URL: "mongodb://mongodb:27017/catalogue"
+  CART_HOST: "cart"
+  CART_PORT: "8080"
+  USER_HOST: "user"
+  USER_PORT: "8080"
+  AMQP_HOST: "rabbitmq"
+  AMQP_USER: "roboshop"
+  AMQP_PASS: "roboshop123"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: catalogue
+  name: payment
   namespace: roboshop
   labels:
     name: roboshop
     env: dev
-    running: catalogue
+    running: payment
 spec: 
   replicas: 1
   selector:
     matchLabels:
       name: roboshop
       env: dev
-      running: catalogue
+      running: payment
   template:
     metadata:
       labels:
         name: roboshop
         env: dev
-        running: catalogue
+        running: payment
     spec:
       containers:
-      - name: catalogue
-        image: balaji1729/catalogue:v1
+      - name: payment
+        image: balaji1729/payment:v1
         imagePullPolicy: Always
         ports:
         - name: liveness-port
           containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: payment-configmap 
         resources:
           requests:
             cpu: 200m
@@ -44,9 +52,6 @@ spec:
           limits:
             cpu: 300m
             memory: 256Mi
-        envFrom:
-        - configMapRef:
-            name: catalogue
         readinessProbe:
           httpGet:
             path: /health
@@ -58,19 +63,19 @@ spec:
             path: /health
             port: liveness-port
           failureThreshold: 1
-          periodSeconds: 30 
+          periodSeconds: 30
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: catalogue
+  name: payment
   namespace: roboshop
 spec:
   type: ClusterIP
   selector:
       name: roboshop
       env: dev
-      running: catalogue
+      running: payment
   ports:
     - protocol: TCP
       port: 8080
@@ -79,13 +84,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: catalogue
+  name: payment
   namespace: roboshop
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: catalogue
+    name: payment
   minReplicas: 1
   maxReplicas: 10
   metrics:
