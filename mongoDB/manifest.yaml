@@ -53,7 +53,7 @@ spec:
           volumeMounts:
           - mountPath: /data/db
             name: mongodb-volume 
-          nodeSelector:
+        nodeSelector:
             topology.kubernetes.io/zone: us-east-1c
   volumeClaimTemplates:
       - name: mongodb-volume
