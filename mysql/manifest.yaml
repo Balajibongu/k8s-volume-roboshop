@@ -64,19 +64,21 @@ spec:
             subPath: my.cnf
       nodeSelector:
                 topology.kubernetes.io/zone: us-east-1c
+  volumes:
+        - name: mysql-config
+          configMap:
+            name: mysql
+
   volumeClaimTemplates:
-      - metadata:
-          name: mysql-config
-        configMap:
-          name: mysql
-      - metadata:  
-          name: mysql-volume
-        spec:
-          accessModes: [ "ReadWriteOnce" ]
-          storageClassName: "ebs-mysql"
-          resources:
-            requests:
-              storage: 1Gi
+    - metadata:
+        name: mysql-volume
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: ebs-mysql
+        resources:
+          requests:
+            storage: 1Gi
 ---
 apiVersion: v1
 kind: Service
