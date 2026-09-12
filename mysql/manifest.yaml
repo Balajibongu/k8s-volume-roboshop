@@ -51,11 +51,11 @@ spec:
         #   periodSeconds: 5
         resources:
             requests:
-              cpu: 200m
-              memory: 256Mi
-            limits:
               cpu: 300m
-              memory: 256Mi
+              memory: 512Mi
+            limits:
+              cpu: 400m
+              memory: 512Mi
         volumeMounts:
           - mountPath: /data/db
             name: mysql-volume 
