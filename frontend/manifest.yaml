@@ -150,6 +150,10 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: frontend
   namespace: roboshop
+  labels:
+    project: roboshop
+    component: frontend
+    tier: frontend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

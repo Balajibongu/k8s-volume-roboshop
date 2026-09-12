@@ -81,6 +81,10 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: catalogue
   namespace: roboshop
+  labels:
+    name: roboshop
+    env: dev
+    running: catalogue
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
