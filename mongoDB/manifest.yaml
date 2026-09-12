@@ -53,10 +53,11 @@ spec:
           volumeMounts:
           - mountPath: /data/db
             name: mongodb-volume 
-        nodeSelector:
-            topology.kubernetes.io/zone: us-east-1c
+  nodeSelector:
+    topology.kubernetes.io/zone: us-east-1c
   volumeClaimTemplates:
-      - name: mongodb-volume
+      - metadata:
+          name: mongodb-volume
         spec:
           accessModes: [ "ReadWriteOnce" ]
           storageClassName: "ebs-mongodb"

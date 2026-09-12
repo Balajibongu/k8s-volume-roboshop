@@ -62,13 +62,15 @@ spec:
           - name: mysql-config
             mountPath: /etc/mysql/conf.d/my.cnf
             subPath: my.cnf
-        nodeSelector:
+  nodeSelector:
             topology.kubernetes.io/zone: us-east-1c
   volumeClaimTemplates:
-      - name: mysql-config
+      - metadata:
+          name: mysql-config
         configMap:
           name: mysql
-      - name: mysql-volume
+      - metadata:  
+          name: mysql-volume
         spec:
           accessModes: [ "ReadWriteOnce" ]
           storageClassName: "ebs-mysql"

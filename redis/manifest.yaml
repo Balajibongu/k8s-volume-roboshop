@@ -49,10 +49,11 @@ spec:
         volumeMounts:
           - mountPath: /data/
             name: redis-volume 
-        nodeSelector:
+  nodeSelector:
             topology.kubernetes.io/zone: us-east-1c
   volumeClaimTemplates:
-      - name: redis-volume
+      - metadata:
+          name: redis-volume
         spec:
           accessModes: [ "ReadWriteOnce" ]
           storageClassName: "ebs-redis"
